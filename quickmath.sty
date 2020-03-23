@@ -1,0 +1,168 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{quickmath}[2018/02/19 quick math]
+
+\ProcessOptions\relax
+
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+\RequirePackage{bm}
+
+%%%%%%%%%%%%%%%%%%%%% SUBSCRIPTS AND SUPERSCRIPTS %%%%%%%%%%%%%%%%%%%%%
+
+% extendable subscript
+\DeclareRobustCommand{\sub}[1]{\@ifnextchar_{\def\sc@thesub{#1}\sc@mergesubs}{_{#1}}}
+\def\sc@mergesubs_#1{_{\sc@thesub#1}}
+
+% raised superscript
+\newcommand{\rsup}[2][0pt]{^{\raisebox{#1}{\scriptsize\(#2\)}}}
+
+%%%%%%%%%%%%%%%%%%%%% RELATIONS AND OPERATORS %%%%%%%%%%%%%%%%%%%%%
+
+% equality relations
+\newcommand{\defeq}{\overset{\text{def}}{=}}
+\mathtoolsset{centercolon} % properly typeset :=
+
+% extra trigonometric functions
+\DeclareMathOperator{\asin}{asin}
+\DeclareMathOperator{\acos}{acos}
+\DeclareMathOperator{\atan}{atan}
+
+% shorthand trigonometric functions
+% TODO: remove space after operator
+\DeclareMathOperator{\sn}{s}
+\DeclareMathOperator{\cs}{c}
+\DeclareMathOperator{\tg}{t}
+
+% shorter minus for subscripts and superscripts to help formulas take less space, e.g. x_{i-1}
+\newcommand{\sm}{\scalebox{0.6}[1.0]{\(\scriptstyle-\)}}
+
+\DeclareMathOperator{\diag}{diag} % diagonal matrix or diagonal of matrix
+\DeclareMathOperator{\sign}{sign}
+
+\newcommand{\T}{^T}% transpose
+\newcommand{\inv}{^{-1}}% inverse
+\newcommand{\pinv}{^\#}% pseudoinverse
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+
+\newcommand{\Skew}{\mvec{S}}
+\newcommand{\fullSkew}[1]{%
+\begin{pmatrix}
+0 & -#1_3 & #1_2\\
+#1_3 & 0 & -#1_1\\
+-#1_2 & #1_1 & 0
+\end{pmatrix}%
+}
+
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\rk}{rk}
+
+%%%%%%%%%%%%%%%%%%%%% NUMBER SETS %%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\NumberSet}[1]{\mathbb{#1}}
+\newcommand{\Natural}{{\NumberSet{N}}}
+\newcommand{\Integer}{{\NumberSet{Z}}}
+\newcommand{\Rational}{{\NumberSet{Q}}}
+\newcommand{\Algebraic}{{\NumberSet{A}}}
+\newcommand{\Real}{{\NumberSet{R}}}
+\newcommand{\Imaginary}{{\NumberSet{I}}}
+\newcommand{\Complex}{{\NumberSet{C}}}
+
+\DeclareMathOperator{\SE}{SE}
+\DeclareMathOperator{\SO}{SO}
+
+%%%%%%%%%%%%%%%%%%%%% ENVIRONMENTS %%%%%%%%%%%%%%%%%%%%%
+
+% inline matrix: \begin{inmat} 1 & 2 \\ 3 & 4 \end{inmat}
+% & creates a small space. \\ creates a semicolon
+\begingroup
+\catcode`&=\active
+\gdef\@setampersand{\def&{\;\,}}
+\endgroup
+
+\newenvironment{inmat}{\catcode`&=\active\@setampersand\def\\{\,;\,}}{}
+
+\newenvironment{pinmat}{\left(\begin{inmat}}{\end{inmat}\right)}
+\newenvironment{binmat}{\left[\begin{inmat}}{\end{inmat}\right]}
+\newenvironment{Binmat}{\left\{\begin{inmat}}{\end{inmat}\right\}}
+\newenvironment{vinmat}{\left\lvert\begin{inmat}}{\end{inmat}\right\lvert}
+\newenvironment{Vinmat}{\left\lVert\begin{inmat}}{\end{inmat}\right\lVert}
+
+% Starred versions of \[ and \] : enable numbering
+\renewcommand{\[}{%
+\@ifstar{\begin{equation}}{\begin{equation*}}%
+}
+\renewcommand{\]}{%
+\@ifstar{\end{equation}}{\end{equation*}}%
+}
+
+%%%%%%%%%%%%%%%%%%%%% DIFFERENTIATION %%%%%%%%%%%%%%%%%%%%%
+
+% differential symbol
+\newcommand{\de}{\mathrm{d}}
+
+% third and fourth time derivative
+\renewcommand{\dddot}[1]{%
+  {\mathop{\kern\z@#1}\limits^{\vbox to-1.4\ex@{\kern-\tw@\ex@\hbox{\normalfont $...$}\vss}}}%
+}
+\renewcommand{\ddddot}[1]{%
+  {\mathop{\kern\z@#1}\limits^{\vbox to-1.4\ex@{\kern-\tw@\ex@\hbox{\normalfont $....$}\vss}}}%
+}
+
+% derivatives.
+% \diff{y}{x}
+% \diff[n]{y}{x}
+% \ddiff{y}{x}=\diff[2]{y}{x}
+% \ddiff{z}{x}{y}
+% starred version: forces tfrac
+\newcommand{\make@diff}[2]{
+    \expandafter\newcommand\csname #1@diff\endcsname[3][]{%
+        \@frac{#2^{##1}\;\!\!##2}{#2##3^{##1}}%
+    }
+    \expandafter\newcommand\csname #1diff\endcsname{%
+        \@ifstar{\def\@frac{\tfrac}\expandafter\csname #1@diff\endcsname}{\def\@frac{\frac}\expandafter\csname #1@diff\endcsname}%
+    }
+    \expandafter\newcommand\csname #1ddiff@i\endcsname[1]{%
+        \@frac{#2^2\;\!\!\temp@a}{#2\temp@b#2 ##1}%
+    }
+    \expandafter\newcommand\csname #1@ddiff\endcsname[2]{%
+        \@ifnextchar\bgroup{\def\temp@a{##1}\def\temp@b{##2}\expandafter\csname#1ddiff@i\endcsname}{\expandafter\csname #1@diff\endcsname[2]{##1}{##2}}%
+    }
+    \expandafter\newcommand\csname #1ddiff\endcsname{%
+        \@ifstar{\def\@frac{\tfrac}\expandafter\csname #1@ddiff\endcsname}{\def\@frac{\frac}\expandafter\csname #1@ddiff\endcsname}%
+    }
+}
+
+% available commands: diff, pdiff, fdiff
+\make@diff{}{\de}
+\make@diff{p}{\partial}
+\make@diff{f}{\delta}
+
+%%%%%%%%%%%%%%%%%%%%% VECTOR DEFINITION %%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\mvec}[1]{\bm{#1}}
+\newcommand{\dmvec}[1]{\dot{\mvec{{#1}}}}
+\newcommand{\ddmvec}[1]{\ddot{\mvec{{#1}}}}
+\newcommand{\dddmvec}[1]{\dddot{\mvec{{#1}}}}
+\newcommand{\ddddmvec}[1]{\ddddot{\mvec{{#1}}}}
+
+%%%%%%%%%%%%%%%%%%%%% MISCELLANEA %%%%%%%%%%%%%%%%%%%%%
+\DeclareMathOperator{\st}{s{.}t{.}}
+\newcommand{\etal}{{\itshape et~al.}}
+
+\newcommand{\disallowdisplaybreaks}{\interdisplaylinepenalty=10000}
+
+%%%%%%%%%%%%%%%%%%%%% GENERIC SHORTHANDS %%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\zerov}{\mvec{0}}
+\newcommand{\Id}{\mvec{I}}
+
+\newcommand{\Rm}{\mvec{R}} % rotation matrix
+
+\newcommand{\xv}{\hat{\mvec{x}}} % versors
+\newcommand{\yv}{\hat{\mvec{y}}}
+\newcommand{\zv}{\hat{\mvec{z}}}
+
+\newcommand{\ev}{\mvec{e}} % euclidean standard basis vector

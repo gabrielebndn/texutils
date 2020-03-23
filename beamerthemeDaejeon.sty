@@ -1,0 +1,121 @@
+\ProvidesPackage{beamerthemeDaejeon}
+%%%%%%%%%% This theme is basically a modified Hannover
+
+\DeclareOptionBeamer{width}
+{\PassOptionsToPackage{width=#1}{beamerouterthemesidebar}}
+
+\DeclareOptionBeamer{hideothersubsections}
+{\PassOptionsToPackage{hideothersubsections=#1}{beamerouterthemesidebar}}
+
+\DeclareOptionBeamer{hideallsubsections}
+{\PassOptionsToPackage{hideallsubsections=#1}{beamerouterthemesidebar}}
+
+\newif\if@sectionpages
+\DeclareOptionBeamer{secpages}{\@sectionpagestrue}
+\DeclareOptionBeamer{nosecpages}{\@sectionpagesfalse}
+
+\ExecuteOptionsBeamer{secpages}
+
+\ProcessOptionsBeamer
+
+%%%%%%%%%% general
+\beamertemplatenavigationsymbolsempty
+\usefonttheme[onlymath]{serif}
+
+%%%%%%%%%% outer, inner and color themes
+\useoutertheme[height=0pt,left]{sidebar}
+\useinnertheme[shadow]{rounded}
+\usecolortheme[RGB={130, 36, 51}]{structure}
+\usecolortheme{whale} 
+\usecolortheme{orchid}
+\setbeamersize{text margin left=5pt,text margin right=5pt}
+
+%%%%%%%%%% customized major templates
+
+\addtobeamertemplate{sidebar left}{\resizebox{\beamer@sidebarwidth}{!}{\insertlogo}}{}
+
+\setbeamertemplate{frametitle}[default][left]
+
+\renewcommand{\maketitle}{\ifbeamer@inframe\titlepage\else\frame[plain]{\titlepage}\fi}
+
+\setbeamertemplate{title page}{
+\ifbeamer@plainframe\hspace*{-.5\beamer@sidebarwidth}\else\fi%
+\begin{minipage}[c][\textheight]{\textwidth}
+    \begin{beamercolorbox}[sep=4pt,center]{title}
+      \usebeamerfont{title}\inserttitle\par%
+      \ifx\insertsubtitle\@empty%
+      \else%
+        \vskip0.25em%
+        {\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}%
+      \fi%     
+    \end{beamercolorbox}%
+%
+%
+\begin{minipage}{0.5\columnwidth}
+%\hspace*{\fill}\resizebox{0.8\columnwidth}{!}{\insertlogo}\hspace*{\fill}
+\vspace{1ex}
+\tableofcontents
+\end{minipage}%
+\begin{minipage}{0.5\columnwidth}
+{\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic}
+\end{minipage}
+
+\vspace*{\fill}
+
+\usebeamerfont{author}%
+\begin{beamercolorbox}[sep=2pt,center]{author}%
+  \insertauthor%
+\end{beamercolorbox}
+
+\usebeamerfont{institute}%
+\begin{beamercolorbox}[center]{institute}%
+  \insertinstitute%
+\end{beamercolorbox}
+
+\usebeamerfont{date}%
+\begin{beamercolorbox}[sep=2pt,center]{date}%
+  \insertdate%
+\end{beamercolorbox}
+
+\end{minipage}
+}
+
+\setbeamertemplate{section page}{
+\frame{\frametitle{\ }\centering\insertsection}
+}
+
+\if@sectionpages
+\AtBeginSection{\ifx\insertsection\empty\else\sectionpage\fi} % FIX IF NO SECTION
+\fi
+
+%%%%%%%%%% customized minor templates
+\setbeamerfont*{normal text}{size=\Large}
+
+\setbeamercolor{title in head/foot}{parent=palette primary}
+
+\setbeamercolor*{titlelike}{use=structure,fg=structure.fg}
+\setbeamerfont*{title}{family=\rmfamily,series=\bfseries,size=\Large}
+\setbeamerfont*{author}{size=\scriptsize}
+\setbeamerfont*{date}{size=\scriptsize}
+\setbeamerfont*{frametitle}{family=\rmfamily,series=\bfseries,size=\LARGE}
+
+\setbeamerfont{section in toc}{size=\footnotesize}
+\setbeamerfont{subsection in toc}{size=\scriptsize}
+\setbeamerfont*{subsubsection in toc}{parent=subsection in toc}
+\setbeamercolor{section in toc}{parent=normal text}
+
+\setbeamerfont{section page}{size=\Huge}
+\setbeamercolor*{section page}{use=structure,fg=structure.fg}
+
+\setbeamercolor{alerted text}{use=structure,fg=structure.fg}
+\setbeamerfont{alerted text}{series=\bfseries}
+
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamercolor{block title}{use=structure,fg=structure.fg,bg=structure.bg}
+\setbeamerfont{block title}{size=\Large}
+\newcommand{\blocktitle}[1]{{\usebeamerfont{block title}\usebeamercolor[fg]{block title}#1}}
+
+\AtBeginDocument{
+\usebeamerfont{normal text}
+\setlength\abovedisplayskip{1pt}
+}
